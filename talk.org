@@ -1,0 +1,383 @@
+#+Title:  Deployment of a Virtual Lab
+#+Author: Thirumal Ravula and Anon Ray
+#+Date:   <2014-12-20 Saturday>
+#+SETUPFILE: ./org-templates/level-0.org
+
+
+* Who we are?
+
+*People*
+  
+Thirumal Ravula, 
+
+Anon Ray
+
+at Virtual Labs Engineering and Architecture Division IIIT, Hyderabad
+
+*Work*
+
+We develop, engineer and maintain the Central Platform of Virtual Labs.
+
+This includes the hosting infrastructure, and a plethora of other related
+platform services required by a Virtual Lab during its life cycle.
+
+* Agenda of this Workshop
+#+BEGIN_HTML
+<img src="https://docs.google.com/drawings/d/1PPWBcvdyeGIbtEhYZXWcNcPUmkDP4SDd2LzGT1ZE8rM/pub?w=1500&amp;h=480">
+#+END_HTML
+
+
+* What is Virtual Labs?
+
+Virtual Labs is a collection of online labs running on a common platform and
+acts as a complement to learning in Engineering and Sciences curriculum.
+All premier Indian technical institutes are contributing their Virtual Labs to
+aid Indian students who don't have access to good laboratory infrastructure.
+
+* Why Virtual Labs?
+
+- Virtual Labs is the next technology to deliver educational content in a highly
+  interactive manner.
+
+- The platform aims to provide high availability and auto-scalability of your lab.
+
+- The platform provides usage analytics, single sign on etc. 
+
+- The application can choose to be deployed on its preferred platform.
+
+
+* Another View of Virtual Labs
+
+#+BEGIN_HTML
+<img src="https://docs.google.com/drawings/d/1uZahThX1odrMmld4HKITzdReFeFB1P0GDbrgLuuu3nY/pub?w=960&amp;h=480">
+#+END_HTML
+
+* Hosting Infrastructure
+#+BEGIN_HTML
+<img src="https://docs.google.com/drawings/d/1yf4epBwPytZMbT72olEJ9Ix9uQ7Zb7ASGKQuIZE0g3A/pub?w=960&amp;h=480">
+#+END_HTML
+
+* Interplay of services while deploying a lab
+#+BEGIN_HTML
+<img src="https://docs.google.com/drawings/d/12F5hM_KX0DoZTY1If9-HCi_hVeJyP1jW2g6ouSGJgyc/pub?w=960&amp;h=480">
+#+END_HTML
+
+
+* Auto-Deployment Service (ADS)
+
+** What is ADS
+#+BEGIN_HTML
+<img src="https://docs.google.com/drawings/d/1RgyRmh51GGZCJkFXBhXOoO9CZhNikAQ-ZgWXkmHdYOM/pub?w=960&amp;h=480">
+#+END_HTML
+
+** Leveraging ADS
+#+BEGIN_HTML
+<img src="https://docs.google.com/drawings/d/1ueZy3RL7it30gPuZAHzSz56EeR6Hm6W6hRsygMJRAQU/pub?w=960&amp;h=480">
+#+END_HTML
+
+
+* Labspec
+
+Detailed discussion regarding various attributes of the lab spec.
+- How to specify *dependencies*.
+- How to specify *pre-install steps*.
+- How to specify *install steps*.
+- How to specify *post-install steps*.
+- How to specify various *meta information* regarding the lab.
+
+#+BEGIN_EXAMPLE
+{
+    "lab": {
+      "description": {
+            "id": "stall",
+            "name": "STALL_LAB",
+            "discipline": ["SHOWCASE"],
+            ...
+            "developer": [
+                {
+                    "contact": {
+                        "email": "stall@vlabs.ac.in",
+                        "alternate_email": "",
+                        "mobile_number": "",
+                        "office_number": ""
+                    },
+                    "department": "",
+                    "institute": "",
+                    "name": "",
+                    "organization": "",
+                    "role": "",
+                    "title": "",
+                    "web": ""
+                }
+            ]
+        },
+
+        "build_requirements": {
+            "platform": {
+                "arch": "",
+                "build_steps": {
+                    "build": ["make -C ../src"],
+                    ...
+                },
+            }
+        },
+
+        "runtime_requirements": {
+            "platform": {
+                "arch": "x86_64",
+                "installer": ["sudo apt-get update", 
+                              "sudo apt-get install -y apache2"],
+                "lab_actions": {
+                    "init": ["mv /var/www/index.html index.html.default",
+                             "cp -r ../src/* /var/www/"],
+                    "shutdown": ["service apache2 stop"],
+                    "start": ["service apache2 start"],
+                },
+                "memory": {
+                    "max_required": "",
+                    "min_required": ""
+                },
+                "storage": {
+                    "min_required": ""
+                }
+            }
+        }
+    },
+    "template": "1.0"
+}
+#+END_EXAMPLE
+
+
+* Develop and deploy your own virtual lab
+
+** Download the sample template of a virtual lab
+
+- Go to: https://github.com/vlead/t4e-sample-lab
+- Click on =Download ZIP= to download sources of a web application that you would deploy.
+- Extract the contents of the zip file by running the command
+#+BEGIN_EXAMPLE
+unzip t4e-sample-lab-master.zip 
+#+END_EXAMPLE
+
+
+** Edit the source of the virtual lab template
+
+- let's look into the sample template
+#+BEGIN_EXAMPLE
+cd t4e-sample-lab-master
+#+END_EXAMPLE
+- the `src` directory contains the source code of the lab
+- the `scripts` directory contains the labspec and other scripts
+- let's make some modifications in the source HTML files
+#+BEGIN_EXAMPLE
+cd src
+#+END_EXAMPLE
+- open index.html in an editor and make modifications.
+
+
+** Edit the lab spec of your new virtual lab
+
+*** Editing the lab spec
+
+- We already know the `labspec` file which is required to specify the
+  installation and deployment steps of a lab.
+
+- Lets look at the labspec now which is located inside the `scripts`
+  directory.
+#+BEGIN_EXAMPLE
+cd ../scripts
+#+END_EXAMPLE
+- Open the labspec.json in an editor.
+
+- Let's look at the following fields that are necessary for a lab
+  specification, one by one to understand them and fill them with appropriate
+  values.
+
+*** Meta information related to the lab
+
+
+- *id*: any string which can be used as an identifier for the lab.
+  e.g - let's use three-letter discipline name followed by 2-digit numeric to
+  represent your lab. But this can be anything.
+- *name*: the name of the lab
+- *discipline*: to specify the discipline name of the lab
+- *description* -> *developer*: the list of the developers for the lab along with
+  their contact details
+
+#+BEGIN_EXAMPLE
+    {
+        "id": "cse02",
+        "name": "Computer Programming",
+        "discipline": [
+            "Computer Science & Engineering"
+        ],
+        "description": {
+            "developer": [
+                {
+                    "contact": {
+                        "alternate_email": "",
+                        "email": "jawahar@iiit.ac.in",
+                        "mobile_number": "",
+                        "office_number": ""
+                    },
+                    "department": "",
+                    "institute": "IIIT Hyderabad",
+                    "name": "Jawahar C.V",
+                    "organization": "",
+                    "role": "Lab Developer",
+                    "title": "",
+                    "web": ""
+                }
+            ]
+    }
+#+END_EXAMPLE
+/Sample labspec to show the lab information related fields/
+
+*** Build requirements of the lab
+
+  - *build steps* -> *build*: to specify any build steps that are necessary for
+    the lab before installation
+  - *os, and osVersion*: to mention on what OS and OS version the build steps to
+    be performed.
+
+#+BEGIN_EXAMPLE
+    "build_requirements": {
+        "platform": {
+            "arch": "i386",
+            "build_steps": {
+                "build": ["make -C ../src"],
+                .
+                .
+            },
+            "os": "ubuntu",
+            "osVersion": "12"
+            .
+            .
+        }
+        .
+        .
+    }
+#+END_EXAMPLE
+/Sample labspec to show the build requirment related fields of a lab/
+
+*** Runtime requirements:
+  - *architecture*: on what architecture the lab will run (~i386~ - 32bit or
+    ~x86_64~ - 64bit)
+  - *hosting*: dedicated hosting or shared hosting; default is dedicated.
+  - *installer*: the list of steps that are to be performed for the lab to get
+    installed. This is the field where one specifies the steps to install the
+    dependencies of a lab.
+#+BEGIN_EXAMPLE
+"installer": ["sudo apt-get update", 
+             "sudo apt-get install -y apache2"],
+#+END_EXAMPLE
+
+  - *lab actions* -> *init*: to specify the steps to run after the lab is
+    installed. E.g - the final deployment steps, post-install steps etc.
+#+BEGIN_EXAMPLE
+"init": ["mv /var/www/index.html index.html.default",
+         "cp -r ../src/* /var/www/"]
+#+END_EXAMPLE
+
+  - *lab actions* -> *start*: the steps to start the services of a lab(if
+    required)
+#+BEGIN_EXAMPLE
+"start": ["service apache2 start"],
+#+END_EXAMPLE
+
+  - *lab actions* -> *shutdown*: the steps to stop the services of a lab(if
+    required)
+#+BEGIN_EXAMPLE
+"shutdown": ["service apache2 stop"],
+
+#+END_EXAMPLE
+
+- Snippet of sample run time requirements
+#+BEGIN_EXAMPLE
+    "runtime_requirements": {
+        "platform": {
+            "arch": "x86_64",
+            "hosting": "dedicated",
+            "installer": [
+                "sudo apt-get update",
+                "sudo apt-get install -y php5 apache2",
+                "sudo apt-get install -y mysql memcache"
+            ],
+            "lab_actions": {
+                "init": [
+                    "mv /var/www/index.html index.html.default",
+                    "cp -r ../build/* /var/www/"
+                ],
+                "shutdown": ["service apache2 stop"],
+                "start": ["service apache2 start"],
+                .
+                .
+            }
+        }
+    }
+#+END_EXAMPLE
+/Sample labspec to show the runtime requirment related fields of a lab/
+
+*** System requirements of the lab
+
+- *memory*: minimum required memory to be filled out. we also have a cap on the
+  maximum memory a lab would need.
+- *os, osVersion*: to specify OS and OS version on which the lab would run.
+- *storage*: the minimum required storage for a lab
+
+
+** Initialise your virtual lab to be a git repository
+
+- now let's make our virtual lab a git repo as well.
+- run `git init` inside the sample template directory. Make sure you are at the top level.
+ 
+#+BEGIN_EXAMPLE
+git init
+#+END_EXAMPLE
+- If git in not present, install git.
+#+BEGIN_EXAMPLE
+apt-get install -y git
+#+END_EXAMPLE
+
+- Add the files
+#+BEGIN_EXAMPLE
+git add .
+#+END_EXAMPLE
+- Commit the files
+#+BEGIN_EXAMPLE
+git commit -m "Initial commit"
+#+END_EXAMPLE
+
+** Create an online repository on GitHub
+
+- go to =www.github.com= and login to your account. (Create if you do not have one)
+- Click on =New repository= button on the home page.
+- Provide the =Repository name=
+- Provide =Description=
+- Click on =Create repository= button
+
+** Push the virtual lab repository on to GitHub
+
+- Copy the repository URL
+- Make it the remote of your newly created local git repository.
+#+BEGIN_EXAMPLE
+git remote add origin https://github.com/<user-name>/<repo-name>
+#+END_EXAMPLE
+
+- Push all the contents of the local repository to GitHub
+#+BEGIN_EXAMPLE
+git push origin master
+#+END_EXAMPLE
+
+** Go to ADS service and Deploy your lab
+
+- Open browser and navigate to =http://<ip-address>:8080=. 
+  Replace =<ip-address>= with the ip address given to you.
+- Fill =Lab ID=  and =Repo url= fields.
+  =Lab ID= is the id that you have given in the labspec.json file.
+  =Repo url= is the url of your github repository.
+
+** Watch your lab go live!
+
+- Hit the submit button and sit back, it takes some time to deploy the lab!
+- Access the new deployed lab by navigating to =http://<ip-address>=
